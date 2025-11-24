@@ -1,0 +1,141 @@
+{
+  "info": {
+    "_postman_id": "workout-tests-001",
+    "name": "Workout Tracker API - Automated Tests",
+    "description": "Suite de pruebas automatizadas para Workout API.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Admin Login - Positive",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Has access token\", () => {",
+                  "  const data = pm.response.json();",
+                  "  pm.expect(data).to.have.property('access_token');",
+                  "  pm.environment.set('admin_token', data.access_token);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/x-www-form-urlencoded" }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "username", "value": "{{admin_user}}" },
+                { "key": "password", "value": "{{admin_pass}}" }
+              ]
+            },
+            "url": "{{base_url}}/api/auth/login"
+          }
+        },
+        {
+          "name": "Admin Login - Wrong Password",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 400\", () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/x-www-form-urlencoded" }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                { "key": "username", "value": "{{admin_user}}" },
+                { "key": "password", "value": "wrongpass" }
+              ]
+            },
+            "url": "{{base_url}}/api/auth/login"
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "Workouts",
+      "item": [
+        {
+          "name": "Create Workout - Authorized",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", () => pm.response.to.have.status(200));",
+                  "const res = pm.response.json();",
+                  "pm.expect(res).to.have.property('id');",
+                  "pm.environment.set('workout_id', res.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{admin_token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"name\": \"Leg Day\", \"duration\": 60 }"
+            },
+            "url": "{{base_url}}/api/workouts"
+          }
+        },
+        {
+          "name": "Create Workout - Unauthorized",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 403\", () => pm.response.to.have.status(403));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"name\": \"Chest Day\", \"duration\": 45 }"
+            },
+            "url": "{{base_url}}/api/workouts"
+          }
+        }
+      ]
+    }
+  ],
+
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8000" },
+    { "key": "admin_user", "value": "admin@example.com" },
+    { "key": "admin_pass", "value": "admin123" },
+    { "key": "admin_token", "value": "" },
+    { "key": "test_user_id", "value": "" },
+    { "key": "workout_id", "value": "" }
+  ]
+}

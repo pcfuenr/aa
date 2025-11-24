@@ -1,0 +1,28 @@
+# Ignorar entornos virtuales
+.venv
+env
+venv
+
+# Archivos de compilación Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Configuración del IDE
+.idea
+.vscode
+
+# Archivos de Git
+.git
+.gitignore
+
+# Archivos de entorno
+.env
+*.env
+
+# Logs
+*.log
+
+# Documentación
+README.md

@@ -1,0 +1,20 @@
+# Dependencias (se instalan en el contenedor)
+node_modules
+
+# Builds locales
+dist
+build
+
+# Configuración local
+.env
+.env.local
+.DS_Store
+.idea
+.vscode
+
+# Archivos de Git
+.git
+.gitignore
+
+# Logs
+*.log

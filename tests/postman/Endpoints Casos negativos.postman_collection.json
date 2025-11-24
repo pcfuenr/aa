@@ -1,0 +1,2385 @@
+{
+	"info": {
+		"_postman_id": "27b03c12-d616-4764-af0c-7f75ce733400",
+		"name": "Endpoints Casos negativos",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "49773909",
+		"_collection_link": "https://fcifuentes2023-4001994.postman.co/workspace/G10's-Workspace~cd2b9dca-af9d-4cd5-8e11-d8048f3dbdcc/collection/49628549-27b03c12-d616-4764-af0c-7f75ce733400?action=share&source=collection_link&creator=49773909"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "/login admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"//Test para verificar que el endpoint de login devuelve un error 400 o 401 cuando las credenciales son incorrectas.\r",
+									"pm.test(\"Devuelve codigo de error 400\", () => {\r",
+									"    //Verifica que el codigo de estado HTTP sea 400 o 401\r",
+									"    pm.expect(pm.response.code).to.be.oneOf([400]);\r",
+									"});\r",
+									"//Test para verificar que el mensaje entregado sea el correcto\r",
+									"pm.test(\"Responde con mensaje invalido\", () => {\r",
+									"    //Guardamos el cierpo de la respuesta del formato json\r",
+									"    const data = pm.response.json();\r",
+									"    //La comparamos con el esperado\r",
+									"    pm.expect(data.detail).to.eql(\"Incorrect email or password\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "username",
+									"value": "{{admin_email}}",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "\"incorrecto\"",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/login usuario contraseña incorrecta",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Devuelve código de error 400\", () => {\r",
+									"    pm.expect(pm.response.code).to.be.oneOf([400]);\r",
+									"});\r",
+									"\r",
+									"//Test para verificar que el mensaje entregado sea el correcto\r",
+									"pm.test(\"Responde con mensaje invalido\", () => {\r",
+									"    //Guardamos el cierpo de la respuesta del formato json\r",
+									"    const data = pm.response.json();\r",
+									"    //La comparamos con el esperado\r",
+									"    pm.expect(data.detail).to.eql(\"Incorrect email or password\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "username",
+									"value": "{{user_email}}",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "incorrect_password",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/login usuario inexistente",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Devuelve código de error 400\", function () {\r",
+									"    pm.expect(pm.response.code).to.be.oneOf([400]);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Mensaje indica credenciales invalidas\", () => {\r",
+									"    const data = pm.response.json();\r",
+									"    pm.expect(data.detail).to.eql(\"Incorrect email or password\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "username",
+									"value": "noexiste@gmail.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "1234",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/login metodo incorrecto",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Devuelve 405 por metodo incorrecto\", () => {\r",
+									"    pm.expect(pm.response.code).to.eql(405);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Indica el metodo permitido en el header\", () => {\r",
+									"    pm.expect(pm.response.headers.get(\"Allow\")).to.include(\"POST\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Mensaje de detalle correcto\", () => {\r",
+									"    pm.expect(pm.response.json().detail).to.eql(\"Method Not Allowed\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": []
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/login sin campos",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Devuelve 422 o 400 si faltan campos requeridos\", () => {pm.expect(pm.response.code).to.be.oneOf([400, 422]);\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"El detalle indica que faltan username y password\", () => {\r",
+									"  //Guara en data la respuesta en json\r",
+									"  const data = pm.response.json();\r",
+									"  //vericia que el cambpo detail exista y sea un arreglo\r",
+									"  pm.expect(data.detail).to.be.an(\"array\");\r",
+									"  //Toma el primer y segundo error y obtiene el nombre del campo faltante\r",
+									"  const camposFaltantes = [data.detail[0].loc[1], data.detail[1].loc[1]];\r",
+									"  //Comprueba que ambos campos estén en la lista\r",
+									"  pm.expect(camposFaltantes).to.include.members([\"username\", \"password\"]);\r",
+									"\r",
+									"  //Verifica que el mensaje de cada error sea el correcto\r",
+									"  data.detail.forEach(e => {\r",
+									"    pm.expect(e.msg).to.eql(\"Field required\");\r",
+									"  });\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "username",
+									"value": "",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Admin",
+			"item": [
+				{
+					"name": "eliminar usuario inexistente",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"pm.test(\"Devuelve 404 si el usuario no existe\", () => {\r",
+									"    pm.expect(pm.response.code).to.eql(404);\r",
+									"});\r",
+									"\r",
+									"const data = pm.response.json();\r",
+									"pm.expect(data.detail).to.match(/not found/i);\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{admin_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/users/99999",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"users",
+								"99999"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "obtener lista usuarios sin token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Devuelve 403 si no se envía el token\", () => {\r",
+									"    pm.expect(pm.response.code).to.eql(403);\r",
+									"});\r",
+									"\r",
+									"const data = pm.response.json();\r",
+									"\r",
+									"pm.test(\"El mensaje de error es correcto\", () => {\r",
+									"    pm.expect(data.detail).to.eql(\"Not authenticated\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/users\n",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"users\n"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "modificar usuario inexistente",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Devuelve 404 si el usuario no existe\", () => {\r",
+									"    pm.expect(pm.response.code).to.eql(404);\r",
+									"});\r",
+									"\r",
+									"const data = pm.response.json();\r",
+									"pm.expect(data.detail.toLowerCase()).to.include(\"user not found\");"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{admin_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"usuario_editado@mail.com\",\r\n  \"username\": \"usuario_editado\",\r\n  \"is_active\": true\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/users/8888",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"users",
+								"8888"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "crear usuario con email repetido",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Devuelve 400 si el email ya existe\", () => {\r",
+									"    pm.expect(pm.response.code).to.eql(400);\r",
+									"});\r",
+									"\r",
+									"const data = pm.response.json();\r",
+									"\r",
+									"pm.test(\"El mensaje de error es correcto\", () => {\r",
+									"    pm.expect(data.detail).to.eql(\"The user with this email already exists in the system.\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{admin_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"admin@example.com\",\r\n  \"username\": \"Duplicado\",\r\n  \"password\": \"1234\",\r\n  \"is_active\": true\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/users\n",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"users\n"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "crear usuario con username repetido",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Devuelve 400 si el username ya existe\", () => {\r",
+									"    pm.expect(pm.response.code).to.eql(400);\r",
+									"});\r",
+									"\r",
+									"const data = pm.response.json();\r",
+									"\r",
+									"pm.test(\"El mensaje de error es correcto\", () => {\r",
+									"    pm.expect(data.detail).to.eql(\"The user with this username already exists in the system.\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{admin_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"nuevocorreo@gmail.com\",\r\n  \"username\": \"admin\",\r\n  \"password\": \"1234\",\r\n  \"is_active\": true\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/users\n",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"users\n"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "obtener workout inexistente",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Devuelve 404 si el workout no existe\", () => {\r",
+									"    pm.expect(pm.response.code).to.eql(404);\r",
+									"});\r",
+									"\r",
+									"const data = pm.response.json();\r",
+									"\r",
+									"pm.test(\"El mensaje de error es correcto\", () => {\r",
+									"    pm.expect(data.detail).to.eql(\"Workout template not found\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{admin_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"name\": \"Full fitness\", \"is_public\": true, \"description\":\"Para estar hiperdotado de musculos\"}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/workout-templates/99999",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"workout-templates",
+								"99999"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "actualizar workout inexistente",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Devuelve 404 si el workout no existe\", () => {\r",
+									"    pm.expect(pm.response.code).to.eql(404);\r",
+									"});\r",
+									"\r",
+									"const data = pm.response.json();\r",
+									"\r",
+									"pm.test(\"El mensaje de error es correcto\", () => {\r",
+									"    pm.expect(data.detail).to.eql(\"Workout template not found\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{admin_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Plan de prueba actualizado\",\r\n  \"description\": \"Intento de actualizar un workout inexistente\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/workout-templates/9999",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"workout-templates",
+								"9999"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "eliminar workout inexistente",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Devuelve 404 si el workout no existe\", () => {\r",
+									"    pm.expect(pm.response.code).to.eql(404);\r",
+									"});\r",
+									"\r",
+									"const data = pm.response.json();\r",
+									"\r",
+									"pm.test(\"El mensaje de error es correcto\", () => {\r",
+									"    pm.expect(data.detail).to.eql(\"Workout template not found\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{admin_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Plan de prueba actualizado\",\r\n  \"description\": \"Intento de actualizar un workout inexistente\"\r\n}\r\n"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/workout-templates/99999",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"workout-templates",
+								"99999"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "crear workout sin token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Devuelve 403 si no se envía el token\", () => {\r",
+									"    pm.expect(pm.response.code).to.eql(403);\r",
+									"});\r",
+									"\r",
+									"const data = pm.response.json();\r",
+									"\r",
+									"pm.test(\"El mensaje de error es correcto\", () => {\r",
+									"    pm.expect(data.detail.toLowerCase()).to.match(/not authenticated|forbidden|not enough permissions/);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Plan sin token\",\r\n  \"description\": \"Intento de crear plantilla sin token\"\r\n}\r\n"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/workout-templates",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"workout-templates"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "agregar ejercicio sin token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Devuelve 403 si no se envia el token\", () => {\r",
+									"    pm.expect(pm.response.code).to.eql(403);\r",
+									"});\r",
+									"\r",
+									"const data = pm.response.json();\r",
+									"\r",
+									"pm.test(\"El mensaje de error es correcto\", () => {\r",
+									"    pm.expect(data.detail).to.eql(\"Not authenticated\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"exercise_id\": 1,\r\n  \"sets\": 5,\r\n  \"reps\": 12\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/workout-templates/{{public_template_id}}/exercises",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"workout-templates",
+								"{{public_template_id}}",
+								"exercises"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "agregar ejercicio a workout inexistente",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Devuelve 404 si el workout no existe al agregar ejercicio\", () => {\r",
+									"    pm.expect(pm.response.code).to.eql(404);\r",
+									"});\r",
+									"\r",
+									"const data = pm.response.json();\r",
+									"\r",
+									"pm.test(\"El mensaje de error es correcto\", () => {\r",
+									"    pm.expect(data.detail).to.eql(\"Workout template not found\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{admin_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"exercise_id\": 1,\r\n  \"sets\": 2,\r\n  \"reps\": 5,\r\n  \"order_index\": 1\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/workout-templates/9999/exercises",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"workout-templates",
+								"9999",
+								"exercises"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "eliminar ejercicio inexistente",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Devuelve 404 si el ejercicio no existe\", () => {\r",
+									"    pm.expect(pm.response.code).to.eql(404);\r",
+									"});\r",
+									"\r",
+									"const data = pm.response.json();\r",
+									"\r",
+									"pm.test(\"El mensaje de error es correcto\", () => {\r",
+									"    pm.expect(data.detail).to.eql(\"Template exercise not found\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{admin_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/workout-templates/{{public_template_id}}/exercises/533",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"workout-templates",
+								"{{public_template_id}}",
+								"exercises",
+								"533"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "registrarse con campos vacios",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Devuelve 422 si faltan campos obligatorios\", () => {\r",
+									"    pm.expect(pm.response.code).to.eql(422);\r",
+									"});\r",
+									"\r",
+									"const data = pm.response.json();\r",
+									"pm.test(\"El mensaje de error indica campos requeridos\", () => {\r",
+									"    pm.expect(JSON.stringify(data).toLowerCase()).to.include(\"field\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/users/register",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "obtener usuario sin token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Devuelve 403 si no se envía el token\", () => {\r",
+									"    pm.expect([403]).to.include(pm.response.code);\r",
+									"});\r",
+									"\r",
+									"const data = pm.response.json();\r",
+									"pm.test(\"Mensaje de error no autenticado\", () => {\r",
+									"    pm.expect(data.detail.toLowerCase()).to.match(/not authenticated/);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/users/me",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "actualizar usuario sin token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Devuelve 403 si no se envia el token\", () => {\r",
+									"    pm.expect([401, 403]).to.include(pm.response.code);\r",
+									"});\r",
+									"\r",
+									"const data = pm.response.json();\r",
+									"pm.test(\"El mensaje de error es Not authenticated\", () => {\r",
+									"    pm.expect(data.detail.toLowerCase()).to.match(/not authenticated|forbidden/);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"full_name\": \"Rodrigoelpro\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users/me",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "registrarse con email repetido",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Devuelve 400 si el email no existe\", () => {\r",
+									"    pm.expect(pm.response.code).to.eql(400);\r",
+									"});\r",
+									"\r",
+									"const data = pm.response.json();\r",
+									"\r",
+									"pm.test(\"El mensaje de error es correcto\", () => {\r",
+									"    pm.expect(data.detail).to.eql(\"The user with this email already exists in the system\");\r",
+									"});\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"admin@example.com\",\r\n  \"username\": \"ñau\",\r\n  \"password\": \"1234\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users/register",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"register"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Workouts",
+			"item": [
+				{
+					"name": "solicitar workout sin token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Devuelve 403 si no se envía token\", () => {\r",
+									"    pm.expect([403]).to.include(pm.response.code);\r",
+									"});\r",
+									"\r",
+									"const data = pm.response.json();\r",
+									"\r",
+									"pm.test(\"El mensaje de error indica falta de autenticación\", () => {\r",
+									"    pm.expect(data.detail).to.eql(\"Not authenticated\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/workouts/{{active_workout_id}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"workouts",
+								"{{active_workout_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "obtener un workout que no existe",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Devuelve 404 si el workout no existe\", () => {\r",
+									"    pm.expect(pm.response.code).to.eql(404);\r",
+									"});\r",
+									"\r",
+									"const data = pm.response.json();\r",
+									"\r",
+									"pm.test(\"El mensaje de error indica que no se encontró\", () => {\r",
+									"    pm.expect(data.detail).to.match(/not found/i);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{admin_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/workout/99999",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"workout",
+								"99999"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "crear workout sin campos",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Debe responder con 422 Unprocessable Entity\", function () {\r",
+									"    pm.response.to.have.status(422);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Debe indicar que faltan campos requeridos\", function () {\r",
+									"    let jsonData;\r",
+									"    try {\r",
+									"        jsonData = pm.response.json();\r",
+									"    } catch (e) {\r",
+									"        pm.expect.fail(\"La respuesta no está en formato JSON\");\r",
+									"    }\r",
+									"\r",
+									"    //Verificar que detail existe y es un array\r",
+									"    pm.expect(jsonData).to.have.property(\"detail\");\r",
+									"    pm.expect(jsonData.detail).to.be.an(\"array\").that.is.not.empty;\r",
+									"\r",
+									"    const firstError = jsonData.detail[0];\r",
+									"\r",
+									"    //Validar estructura general del error\r",
+									"    pm.expect(firstError).to.have.property(\"type\", \"missing\");\r",
+									"    pm.expect(firstError).to.have.property(\"msg\");\r",
+									"    pm.expect(firstError.msg.toLowerCase()).to.include(\"field\");\r",
+									"\r",
+									"    //Verificar que la ubicación es el cuerpo\r",
+									"    pm.expect(firstError.loc).to.include(\"body\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"No debe haberse creado ningún workout\", function () {\r",
+									"    const text = pm.response.text();\r",
+									"    pm.expect(text).to.not.include(\"workout_id\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{admin_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/workouts",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"workouts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "agregar ejercicio a workout que no existe",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Debe responder codigo de error 422\", function () {\r",
+									"    pm.response.to.have.status(422);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Debe indicar que faltan campos requeridos\", function () {\r",
+									"    let jsonData;\r",
+									"    try {\r",
+									"        jsonData = pm.response.json();\r",
+									"    } catch (e) {\r",
+									"        pm.expect.fail(\"La respuesta no está en formato JSON\");\r",
+									"    }\r",
+									"\r",
+									"    pm.expect(jsonData).to.have.property(\"detail\");\r",
+									"    pm.expect(jsonData.detail).to.be.an(\"array\").that.is.not.empty;\r",
+									"\r",
+									"    const missingFields = jsonData.detail.map(err => err.loc[1]);\r",
+									"    pm.expect(missingFields).to.include.members([\"exercise_id\", \"order_index\"]);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"No debe haberse agregado ejercicio\", function () {\r",
+									"    const jsonText = pm.response.text();\r",
+									"    pm.expect(jsonText).to.not.match(/\"workout_id\"|{\"id\":\\s*\\d+/);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{admin_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"exercise_template_id\": 2,\r\n  \"order\": 1\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/workouts/9999/exercises\n",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"workouts",
+								"9999",
+								"exercises\n"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "agregar set a un workout completado",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Debe responder con 400 o 403 por workout completado\", function () {\r",
+									"    pm.expect(pm.response.code).to.be.oneOf([400, 403]);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Debe indicar que el workout no se puede modificar\", function () {\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property(\"detail\");\r",
+									"    pm.expect(jsonData.detail.toLowerCase()).to.include(\"cannot modify completed workout\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"No debe haberse agregado ningún set\", function () {\r",
+									"    const text = pm.response.text();\r",
+									"    pm.expect(text).to.not.match(/\"set_id\"|{\"id\":\\s*\\d+/);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{admin_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"weight\": 50,\r\n  \"repetitions\": 10,\r\n  \"set_number\": 1\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/workouts/1/exercises/9999/sets\n",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"workouts",
+								"1",
+								"exercises",
+								"9999",
+								"sets\n"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "modificar workout que no existe",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Debe responder con 404 Not Found\", function () {\r",
+									"    pm.response.to.have.status(404);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Debe indicar que el workout no existe\", function () {\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.detail.toLowerCase()).to.include(\"workout not found\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"No debe haberse modificado ningún workout\", function () {\r",
+									"    const text = pm.response.text();\r",
+									"    pm.expect(text).to.not.match(/\"workout_id\"|{\"id\":\\s*\\d+/);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{admin_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"notes\": \"actualizar un workout inexistente\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/workouts/79999",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"workouts",
+								"79999"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "modificar set en workout completado",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Debe responder con 400 Bad Request por workout completado\", function () {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Debe indicar que no se puede modificar un workout completado\", function () {\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.detail.toLowerCase()).to.include(\"cannot modify completed workout\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"No debe haberse modificado ningún set\", function () {\r",
+									"    const text = pm.response.text();\r",
+									"    pm.expect(text).to.not.match(/\"set_id\"|{\"id\":\\s*\\d+/);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{admin_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"weight\": 60,\r\n  \"repetitions\": 10\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/workouts/1/exercises/2/sets/9999",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"workouts",
+								"1",
+								"exercises",
+								"2",
+								"sets",
+								"9999"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "crear workout sin token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Debe responder con 403 Unauthorized\", function () {\r",
+									"    pm.response.to.have.status(403);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Debe indicar que no está autenticado\", function () {\r",
+									"    let jsonData;\r",
+									"    try {\r",
+									"        jsonData = pm.response.json();\r",
+									"    } catch (e) {\r",
+									"        pm.expect.fail(\"La respuesta no está en formato JSON\");\r",
+									"    }\r",
+									"    pm.expect(jsonData).to.have.property(\"detail\");\r",
+									"    pm.expect(jsonData.detail).to.be.oneOf([\r",
+									"        \"Not authenticated\",\r",
+									"        \"Could not validate credentials\"\r",
+									"    ]);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"El cuerpo no debe contener información del workout creado\", function () {\r",
+									"    const responseText = pm.response.text();\r",
+									"    pm.expect(responseText).to.not.include(\"workout_id\");\r",
+									"    pm.expect(responseText).to.not.include(\"template_id\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"date\": \"2025-11-04T15:00:00\",\r\n  \"template_id\": 1\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/workouts",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"workouts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "actualizar notas en workout completado",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Debe responder con 400 Bad Request por workout completado\", function () {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Debe indicar que no se puede modificar un workout completado\", function () {\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property(\"detail\");\r",
+									"    pm.expect(jsonData.detail.toLowerCase()).to.include(\"cannot modify completed workout\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"No debe haberse modificado nada del workout\", function () {\r",
+									"    const text = pm.response.text();\r",
+									"    pm.expect(text).to.not.match(/\"message\":\"Workout notes updated successfully\"/);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{admin_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"notes\": \"\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/workouts/1/notes",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"workouts",
+								"1",
+								"notes"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "elimianar workout que no existe",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Debe responder con 404 Not Found\", function () {\r",
+									"    pm.response.to.have.status(404);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Debe indicar que el workout no existe\", function () {\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property(\"detail\");\r",
+									"    pm.expect(jsonData.detail.toLowerCase()).to.include(\"workout not found\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"No debe haberse eliminado ningún workout\", function () {\r",
+									"    const text = pm.response.text();\r",
+									"    pm.expect(text).to.not.include(\"Workout cancelled and removed successfully\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{admin_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/workouts/9399",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"workouts",
+								"9399"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "completar workout que no existe",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Debe responder con 404 Not Found\", function () {\r",
+									"    pm.response.to.have.status(404);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Debe indicar que el workout no existe\", function () {\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property(\"detail\");\r",
+									"    pm.expect(jsonData.detail.toLowerCase()).to.include(\"workout not found\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"No debe haberse completado ningún workout\", function () {\r",
+									"    const text = pm.response.text();\r",
+									"    pm.expect(text).to.not.match(/\"message\":\"Workout completed successfully\"/);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{admin_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/workouts/99499/complete",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"workouts",
+								"99499",
+								"complete"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "obtener workout activo sin tenerlo",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Debe responder con 404 Not Found si no hay workout activo\", function () {\r",
+									"    pm.response.to.have.status(404);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Debe indicar que no existe un workout activo\", function () {\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property(\"detail\");\r",
+									"    pm.expect(jsonData.detail.toLowerCase()).to.include(\"no active workout found\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"No debe haberse devuelto ningún workout\", function () {\r",
+									"    const text = pm.response.text();\r",
+									"    pm.expect(text).to.not.match(/\"id\":\\s*\\d+/);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{admin_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8000/api/workouts/active",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"workouts",
+								"active"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "eliminar workout sin token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"servidor responde con codigo 403 \", function () {\r",
+									"    pm.response.to.have.status(403);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Debe indicar que no está autenticado\", function () {\r",
+									"    const jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property(\"detail\");\r",
+									"    pm.expect(jsonData.detail.toLowerCase()).to.include(\"not authenticated\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"No debe haberse eliminado ningún workout\", function () {\r",
+									"    const text = pm.response.text();\r",
+									"    pm.expect(text).to.not.include(\"Workout cancelled and removed successfully\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8000/api/workouts/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"workouts",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Exercises",
+			"item": [
+				{
+					"name": "obtener ejercicios sin token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Devuelve 401 o 403 si no se envía el token\", () => {\r",
+									"    pm.expect([401, 403]).to.include(pm.response.code);\r",
+									"});\r",
+									"\r",
+									"const data = pm.response.json();\r",
+									"\r",
+									"pm.test(\"El mensaje de error indica falta de autenticación\", () => {\r",
+									"    pm.expect(JSON.stringify(data).toLowerCase()).to.include(\"not authenticated\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{user_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/exercises/{{new_exercise_id}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"exercises",
+								"{{new_exercise_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "crear ejercicio sin token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Devuelve 400 si no se proporciona el token de autorización\", () => {\r",
+									"    pm.expect([400]).to.include(pm.response.code);\r",
+									"});\r",
+									"\r",
+									"const data = pm.response.json();\r",
+									"\r",
+									"pm.test(\"El mensaje de error es correcto\", () => {\r",
+									"    pm.expect(data.detail).to.satisfy(msg =>\r",
+									"        msg === \"Not authenticated\" || msg.includes(\"The user doesn't have enough privileges\")\r",
+									"    );\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{user_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Press de Banca\",\r\n  \"description\": \"Pecho\",\r\n  \"exercise_type\": \"WEIGHT_BASED\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/exercises",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"exercises"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "crear ejercicio con campos vacios",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Devuelve 422 por campos inválidos\", () => {\r",
+									"    pm.expect(pm.response.code).to.eql(422);\r",
+									"});\r",
+									"\r",
+									"const data = pm.response.json();\r",
+									"\r",
+									"pm.test(\"El mensaje de error indica valor inválido en exercise_type\", () => {\r",
+									"    pm.expect(JSON.stringify(data).toLowerCase()).to.include(\"weight_based\");\r",
+									"    pm.expect(JSON.stringify(data).toLowerCase()).to.include(\"time_based\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{admin_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{user_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"\",\r\n  \"description\": \"\",\r\n  \"exercise_type\": \"\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/exercises",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"exercises"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "obtener ejercicio inexistente",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Devuelve 404 si el ejercicio no existe\", () => {\r",
+									"    pm.expect(pm.response.code).to.eql(404);\r",
+									"});\r",
+									"\r",
+									"const data = pm.response.json();\r",
+									"\r",
+									"pm.test(\"El mensaje de error indica que no se encontró\", () => {\r",
+									"    pm.expect(data.detail).to.match(/not found/i);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{admin_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{user_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/exercises/99999",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"exercises",
+								"99999"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "modificar ejercicio inexistente",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Devuelve 404 si el ejercicio no existe\", () => {\r",
+									"    pm.expect(pm.response.code).to.eql(404);\r",
+									"});\r",
+									"\r",
+									"const data = pm.response.json();\r",
+									"\r",
+									"pm.test(\"El mensaje de error indica que no se encontró\", () => {\r",
+									"    pm.expect(data.detail).to.match(/not found/i);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{admin_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{user_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Ejercicio fantasma\",\r\n  \"description\": \"no existe\",\r\n  \"exercise_type\": \"WEIGHT_BASED\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/exercises/99999",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"exercises",
+								"99999"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "eliminar ejercicio inexistente",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Devuelve 404 si el ejercicio no existe\", () => {\r",
+									"    pm.expect(pm.response.code).to.eql(404);\r",
+									"});\r",
+									"\r",
+									"const data = pm.response.json();\r",
+									"\r",
+									"pm.test(\"El mensaje de error indica que no se encontró\", () => {\r",
+									"    pm.expect(data.detail).to.match(/not found/i);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{admin_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{user_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/exercises/99999",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"exercises",
+								"99999"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

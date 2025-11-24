@@ -1,0 +1,2606 @@
+{
+	"info": {
+		"_postman_id": "ff5b93bb-d970-4e05-9248-3f92e34d5b45",
+		"name": "Endpoints Casos positivos",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "49628549",
+		"_collection_link": "https://fcifuentes2023-4001994.postman.co/workspace/G10's-Workspace~cd2b9dca-af9d-4cd5-8e11-d8048f3dbdcc/collection/49628549-ff5b93bb-d970-4e05-9248-3f92e34d5b45?action=share&source=collection_link&creator=49628549"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Positivo",
+					"item": [
+						{
+							"name": "/register usuario",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"//metodo de user\r",
+											"pm.test(\"Estado 200 OK\", () => { pm.response.to.have.status(200); });\r",
+											"pm.test(\"Usuario creado\", () => {\r",
+											"    pm.expect(pm.response.json().email).to.include(\"MiPana\"),\r",
+											"        pm.expect(pm.response.json().username).to.include(\"MiPana\");\r",
+											"});\r",
+											"// Guarda los datos de este nuevo usuario para el login\r",
+											"const requestBody = JSON.parse(pm.request.body.raw);\r",
+											"pm.environment.set(\"user_email\", requestBody.email);\r",
+											"pm.environment.set(\"user_pass\", requestBody.password);"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"MiPana{{$randomInt}}@example.com\",\r\n    \"password\": \"123\",\r\n    \"username\": \"MiPana{{$randomInt}}\",\r\n    \"full_name\": \"Pedro Gonzales\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/users/register",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"users",
+										"register"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "/login admin",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"200 OK\", () => { pm.response.to.have.status(200); });\r",
+											"pm.test(\"Se paso correo y contraseña correcto\", () => {\r",
+											"    pm.expect(pm.response.json().access_token).to.be.a(\"string\");\r",
+											"});\r",
+											"// Guarda el token del admin para pruebas posteriores\r",
+											"pm.environment.set(\"admin_token\", pm.response.json().access_token);"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "username",
+											"value": "{{admin_email}}",
+											"type": "text"
+										},
+										{
+											"key": "password",
+											"value": "{{admin_pass}}",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/auth/login",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"login"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "/login usuario",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"200 OK\", () => { pm.response.to.have.status(200); });\r",
+											"pm.test(\"Se paso correo y contraseña correcto\", () => {\r",
+											"    pm.expect(pm.response.json().access_token).to.be.a(\"string\");\r",
+											"});\r",
+											"// Guarda el token del usuario creado para pruebas posteriores\r",
+											"pm.environment.set(\"user_token\", pm.response.json().access_token);"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "username",
+											"value": "{{user_email}}",
+											"type": "text"
+										},
+										{
+											"key": "password",
+											"value": "{{user_pass}}",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/auth/login",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"login"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Admin",
+			"item": [
+				{
+					"name": "Positivo",
+					"item": [
+						{
+							"name": "get user",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Estado 200 OK\", () => { pm.response.to.have.status(200); });\r",
+											"\r",
+											"// Cargar AJV\r",
+											"const Ajv = require('ajv');\r",
+											"const ajv = new Ajv({ allErrors: true, strict: false });\r",
+											"\r",
+											"// Esquema que debe cumplir cada ejercicio\r",
+											"const userScheme = {\r",
+											"  type: \"object\",\r",
+											"  properties: {\r",
+											"    id: { type: \"number\" },\r",
+											"    email: { type: \"string\" },\r",
+											"    username: { type: \"string\" },\r",
+											"    full_name: { type: [\"string\", \"null\"]},\r",
+											"    is_admin: { type: \"boolean\" },\r",
+											"    is_active: { type: \"boolean\" },\r",
+											"    created_at: { type: [\"string\", \"null\"] },\r",
+											"    updated_at: { type: [\"string\", \"null\"] }\r",
+											"  },\r",
+											"  required: [\"id\", \"username\",\"email\"], //Campos obligatorios\r",
+											"  additionalProperties: true \r",
+											"};\r",
+											"\r",
+											"const userArraySchema = {type: \"array\",items: userScheme};\r",
+											"const validate = ajv.compile(userArraySchema);\r",
+											"\r",
+											"let data;\r",
+											"data = pm.response.json();\r",
+											"\r",
+											"// Valida el esquema\r",
+											"pm.test(\"La respuesta es un esquema valido\", function () {\r",
+											"  const valid = validate(data);\r",
+											"  if (!valid) {\r",
+											"    console.log('AJV errors:', validate.errors);\r",
+											"  }\r",
+											"  pm.expect(valid, \"Schema validation failed\").to.be.true;\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{admin_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/admin/users",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"admin",
+										"users"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "post user",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Estado 200 OK\", () => { pm.response.to.have.status(200); });\r",
+											"pm.test(\"Guarda test_user_id\", () => {\r",
+											"    pm.environment.set(\"test_user_id\", pm.response.json().id),\r",
+											"    pm.expect(pm.response.json().email).to.include(\"usuariotest\"),\r",
+											"    pm.expect(pm.response.json().username).to.include(\"usuariotest\");\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{admin_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n \"email\": \"usuariotest{{$randomInt}}@test.com\", \r\n \"password\": \"123\", \r\n \"username\": \"usuariotest{{$randomInt}}\", \r\n \"is_admin\": false\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/admin/users",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"admin",
+										"users"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "modifica user",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200 OK\", () => { pm.response.to.have.status(200); });\r",
+											"pm.test(\"Nombre se actualizó\", () => {\r",
+											"    pm.expect(pm.response.json().full_name).to.equal(\"Nombre Actualizado\");\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{admin_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"full_name\": \"Nombre Actualizado\"}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/admin/users/{{test_user_id}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"admin",
+										"users",
+										"{{test_user_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "workout templates",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Estado 200 OK\", () => { pm.response.to.have.status(200); });\r",
+											"\r",
+											"// Cargar AJV\r",
+											"const Ajv = require('ajv');\r",
+											"const ajv = new Ajv({ allErrors: true, strict: false });\r",
+											"\r",
+											"// Esquema que debe cumplir cada ejercicio\r",
+											"const workoutScheme = {\r",
+											"  type: \"object\",\r",
+											"  properties: {\r",
+											"    id: { type: \"number\" },\r",
+											"    name: { type: \"string\" },\r",
+											"    description: { type: [\"string\", \"null\"]},\r",
+											"    is_public: { type: \"boolean\" },\r",
+											"    created_by: { type: \"number\"},\r",
+											"    created_at: { type: [\"string\", \"null\"] },\r",
+											"    updated_at: { type: [\"string\", \"null\"] },\r",
+											"    template_exercises: {type: [\"string\",\"array\",\"null\"]}\r",
+											"  },\r",
+											"  required: [\"id\", \"name\"], //Campos obligatorios\r",
+											"  additionalProperties: true \r",
+											"};\r",
+											"\r",
+											"const workoutArraySchema = {type: \"array\",items: workoutScheme};\r",
+											"const validate = ajv.compile(workoutArraySchema);\r",
+											"\r",
+											"let data;\r",
+											"data = pm.response.json();\r",
+											"\r",
+											"// Valida el esquema\r",
+											"pm.test(\"La respuesta es un esquema valido\", function () {\r",
+											"  const valid = validate(data);\r",
+											"  if (!valid) {\r",
+											"    console.log('AJV errors:', validate.errors);\r",
+											"  }\r",
+											"  pm.expect(valid, \"Schema validation failed\").to.be.true;\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{admin_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/admin/workout-templates",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"admin",
+										"workout-templates"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "workout templates",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Estado 200 OK\", () => { pm.response.to.have.status(200); });\r",
+											"pm.test(\"Guarda public_template_id\", () => {\r",
+											"    pm.environment.set(\"public_template_id\", pm.response.json().id),\r",
+											"    pm.expect(pm.response.json().name).to.eql(\"Full fitness\"),\r",
+											"    pm.expect(pm.response.json().description).to.eql(\"Para estar hiperdotado de musculos\"),\r",
+											"    pm.expect(pm.response.json().is_public).to.eql(true);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{admin_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"name\": \"Full fitness\", \"is_public\": true, \"description\":\"Para estar hiperdotado de musculos\"}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/admin/workout-templates",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"admin",
+										"workout-templates"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "workout templates privado",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200 OK\", () => { pm.response.to.have.status(200); });\r",
+											"pm.test(\"Guarda private_template_id\", () => {\r",
+											"    pm.environment.set(\"private_template_id\", pm.response.json().id);\r",
+											"    pm.expect(pm.response.json().name).to.eql(\"Template Privado\");\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{admin_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"name\": \"Template Privado\", \"is_public\": false}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/admin/workout-templates",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"admin",
+										"workout-templates"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "workout template",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Estado 200 OK\", () => { pm.response.to.have.status(200); });\r",
+											"pm.test(\"Template esperado\", () => { \r",
+											"    pm.expect(pm.response.json().name).to.eql(\"Full fitness\");\r",
+											"    pm.expect(pm.response.json().description).to.eql(\"Para estar hiperdotado de musculos\");\r",
+											"}); "
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{admin_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/admin/workout-templates/{{public_template_id}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"admin",
+										"workout-templates",
+										"{{public_template_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update template",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200 OK\", () => { pm.response.to.have.status(200); });\r",
+											"pm.test(\"datos esperados\", () => { \r",
+											"    pm.expect(pm.response.json().description).to.eql(\"Template totalmente modificado siiiiii\"),\r",
+											"    pm.expect(pm.response.json().name).to.eql(\"Locuraaaa\");\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{admin_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"description\": \"Template totalmente modificado siiiiii\",\"name\":\"Locuraaaa\"}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/admin/workout-templates/{{public_template_id}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"admin",
+										"workout-templates",
+										"{{public_template_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Nuevo ejercicio Copy",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Estado 200 OK\", () => { pm.response.to.have.status(200); });\r",
+											"pm.test(\"Guarda new_exercise_id\", () => {\r",
+											"    pm.environment.set(\"new_exercise_id\", pm.response.json().id);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{admin_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"name\": \"Press de Banca\", \"description\": \"Pecho\", \"exercise_type\": \"WEIGHT_BASED\"}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/exercises",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"exercises"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "agregar ejercicio",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Estado 200 OK\", () => { pm.response.to.have.status(200); });\r",
+											"pm.test(\"Guarda template_exercise_id\", () => {\r",
+											"    pm.environment.set(\"template_exercise_id\", pm.response.json().id);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{admin_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"exercise_id\": {{new_exercise_id}},\r\n    \"suggested_sets\": 3,\r\n    \"suggested_reps\": 8,\r\n    \"suggested_weight\": 5,\r\n    \"suggested_duration\": 60,\r\n    \"order_index\": 1\r\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/admin/workout-templates/{{public_template_id}}/exercises",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"admin",
+										"workout-templates",
+										"{{public_template_id}}",
+										"exercises"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Ejercicio borrado",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Estado 200 OK\", () => {pm.response.to.have.status(200);});\r",
+											"pm.test(\"Respuesta tiene el mensaje de borrado\", () => {\r",
+											"    pm.expect(pm.response.json().message).to.equal(\"Exercise removed from template successfully\"); \r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const id= pm.response"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{admin_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/admin/workout-templates/{{public_template_id}}/exercises/{{template_exercise_id}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"admin",
+										"workout-templates",
+										"{{public_template_id}}",
+										"exercises",
+										"{{template_exercise_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete workout",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Estado 200 OK\", () => { pm.response.to.have.status(200); });\r",
+											"pm.test(\"Ejercicio borrado\", () => {\r",
+											"    pm.expect(pm.response.json().message).to.equal(\"Workout template deleted successfully\");\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{admin_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{admin_token}}",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"description\": \"Template totalmente modificado siiiiii\",\"name\":\"Locuraaaa\"}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/admin/workout-templates/{{private_template_id}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"admin",
+										"workout-templates",
+										"{{private_template_id}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Positivo",
+					"item": [
+						{
+							"name": "/me",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Estado 200 OK\", () => { pm.response.to.have.status(200); });\r",
+											"//Recordar que se debe ejecutar el test de autenticación antes de este test.\r",
+											"pm.test(\"Email es el del usuario logueado\", () => {\r",
+											"    pm.expect(pm.response.json().email).to.equal(pm.environment.get(\"user_email\"));\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{user_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{user_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/users/me",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"users",
+										"me"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "/me 2",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Estado 200 OK\", () => { pm.response.to.have.status(200); });\r",
+											"pm.test(\"Nombre se actualizó\", () => {\r",
+											"     pm.expect(pm.response.json().full_name).to.equal(\"Juana Perez\");\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{user_token}}"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"full_name\": \"Juana Perez\"}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/users/me",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"users",
+										"me"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Workouts",
+			"item": [
+				{
+					"name": "Positivo",
+					"item": [
+						{
+							"name": "Array de workouts templates",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Estado 200 OK\", () => { pm.response.to.have.status(200); });\r",
+											"\r",
+											"// Cargar AJV\r",
+											"const Ajv = require('ajv');\r",
+											"const ajv = new Ajv({ allErrors: true, strict: false });\r",
+											"\r",
+											"// Esquema que debe cumplir cada ejercicio\r",
+											"const workoutsTemplateScheme = {\r",
+											"  type: \"object\",\r",
+											"  properties: {\r",
+											"    id: { type: \"number\" },\r",
+											"    name: { type: [\"string\",\"null\"] },\r",
+											"    description: { type: [\"string\",\"null\"] },\r",
+											"    is_public: { type: \"boolean\" },\r",
+											"    created_by: { type: \"number\"},\r",
+											"    created_at: { type: [\"string\", \"null\"] },\r",
+											"    updated_at: { type: [\"string\", \"null\"] },\r",
+											"    template_exercises: { type : \"array\"}\r",
+											"  },\r",
+											"  required: [\"id\"], //Campos obligatorios\r",
+											"  additionalProperties: true \r",
+											"};\r",
+											"\r",
+											"const workoutsTemplateArraySchema = {type: \"array\",items: workoutsTemplateScheme};\r",
+											"const validate = ajv.compile(workoutsTemplateArraySchema);\r",
+											"\r",
+											"let data;\r",
+											"data = pm.response.json();\r",
+											"\r",
+											"// Valida el esquema\r",
+											"pm.test(\"La respuesta son los esquemas validos\", function () {\r",
+											"  const valid = validate(data);\r",
+											"  if (!valid) {\r",
+											"    console.log('AJV errors:', validate.errors);\r",
+											"  }\r",
+											"  pm.expect(valid, \"Schema validation failed\").to.be.true;\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{user_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/workouts/templates",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"workouts",
+										"templates"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Obtener template",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Estado 200 OK\", () => { pm.response.to.have.status(200); });\r",
+											"pm.test(\"Template esperado\", () => { \r",
+											"    pm.expect(pm.response.json().name).to.eql(\"Locuraaaa\");\r",
+											"    pm.expect(pm.response.json().description).to.eql(\"Template totalmente modificado siiiiii\");\r",
+											"}); "
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{user_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/workouts/templates/{{public_template_id}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"workouts",
+										"templates",
+										"{{public_template_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Crear workout en template",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Estado 200 OK\", () => { pm.response.to.have.status(200); });\r",
+											"pm.test(\"Guarda active_workout_id\", () => {\r",
+											"    pm.environment.set(\"active_workout_id\", pm.response.json().id),\r",
+											"    pm.expect(pm.response.json().name).to.eql(\"Rutina de pechito\");\r",
+											"    pm.expect(pm.response.json().notes).to.eql(\"Pa quedar listo\");\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{user_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"name\": \"Rutina de pechito\", \"notes\": \"Pa quedar listo\"}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/workouts/templates/{{public_template_id}}/create-workout",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"workouts",
+										"templates",
+										"{{public_template_id}}",
+										"create-workout"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Array de workouts",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Estado 200 OK\", () => { pm.response.to.have.status(200); });\r",
+											"\r",
+											"// Cargar AJV\r",
+											"const Ajv = require('ajv');\r",
+											"const ajv = new Ajv({ allErrors: true, strict: false });\r",
+											"\r",
+											"// Esquema que debe cumplir cada ejercicio\r",
+											"const workoutsScheme = {\r",
+											"  type: \"object\",\r",
+											"  properties: {\r",
+											"    id: { type: \"number\" },\r",
+											"    name: { type: [\"string\",\"null\"] },\r",
+											"    notes: { type: [\"string\",\"null\"] },\r",
+											"    template_id: { type: [\"number\",\"null\"] },\r",
+											"    user_id: { type: \"number\" },\r",
+											"    created_at: { type: [\"string\", \"null\"] },\r",
+											"    updated_at: { type: [\"string\", \"null\"] },\r",
+											"    workout_exercises: { type : \"array\"}\r",
+											"  },\r",
+											"  required: [\"id\",\"user_id\"], //Campos obligatorios\r",
+											"  additionalProperties: true \r",
+											"};\r",
+											"\r",
+											"const workoutsArraySchema = {type: \"array\",items: workoutsScheme};\r",
+											"const validate = ajv.compile(workoutsArraySchema);\r",
+											"\r",
+											"let data;\r",
+											"data = pm.response.json();\r",
+											"\r",
+											"// Valida el esquema\r",
+											"pm.test(\"La respuesta son los esquemas validos\", function () {\r",
+											"  const valid = validate(data);\r",
+											"  if (!valid) {\r",
+											"    console.log('AJV errors:', validate.errors);\r",
+											"  }\r",
+											"  pm.expect(valid, \"Schema validation failed\").to.be.true;\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{user_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/workouts",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"workouts"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Obtener workout activo",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200 OK\", () => { pm.response.to.have.status(200); });\r",
+											"pm.test(\"ID es el del workout activo\", () => {\r",
+											"    pm.expect(pm.response.json().id).to.equal(pm.environment.get(\"active_workout_id\"));\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{user_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/workouts/active",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"workouts",
+										"active"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Workout",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Estado 200 OK\", () => { pm.response.to.have.status(200); });\r",
+											"pm.test(\"Nombre de la rutina\", () => { \r",
+											"    pm.expect(pm.response.json().name).to.eql(\"Rutina de pechito\"); \r",
+											"    pm.expect(pm.response.json().notes).to.eql(\"Pa quedar listo\");\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{user_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/workouts/{{active_workout_id}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"workouts",
+										"{{active_workout_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Editar workout",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Estado 200 OK\", () => { pm.response.to.have.status(200); });\r",
+											"pm.test(\"Mensaje actualizado correctamente\", () => { \r",
+											"    pm.expect(pm.response.json().notes).to.eql(\"Empezando la rutina\");\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{user_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"notes\": \"Empezando la rutina\"}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/workouts/{{active_workout_id}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"workouts",
+										"{{active_workout_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Nuevo ejercicio Copy",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Estado 200 OK\", () => { pm.response.to.have.status(200); });\r",
+											"pm.test(\"Guarda new_exercise_id\", () => {\r",
+											"    pm.environment.set(\"new_exercise_id\", pm.response.json().id);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{admin_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"name\": \"Press de Banca\", \"description\": \"Pecho\", \"exercise_type\": \"WEIGHT_BASED\"}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/exercises",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"exercises"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Nuevo ejercicio",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Estado 200 OK\", () => { pm.response.to.have.status(200); });\r",
+											"pm.test(\"Guarda workout_exercise_id\", () => {\r",
+											"    pm.environment.set(\"workout_exercise_id\", pm.response.json().id); \r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{user_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"exercise_id\": {{new_exercise_id}}, \"notes\": \"Primera serie\",\"order_index\": 1}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/workouts/{{active_workout_id}}/exercises",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"workouts",
+										"{{active_workout_id}}",
+										"exercises"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Nuevo set",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Estado 200 OK\", () => { pm.response.to.have.status(200); });\r",
+											"pm.test(\"Guarda set_id\", () => { \r",
+											"    pm.environment.set(\"set_id\", pm.response.json().id);\r",
+											"    pm.expect(pm.response.json().reps).to.eql(10),\r",
+											"    pm.expect(pm.response.json().weight).to.eql(50),\r",
+											"    pm.expect(pm.response.json().set_number).to.eql(1);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{user_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"reps\": 10, \"weight\": 50, \"set_number\": 1}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/workouts/{{active_workout_id}}/exercises/{{workout_exercise_id}}/sets",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"workouts",
+										"{{active_workout_id}}",
+										"exercises",
+										"{{workout_exercise_id}}",
+										"sets"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Actualizar set",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Estado 200 OK\", () => { pm.response.to.have.status(200); });\r",
+											"pm.test(\"Datos cambiados bien\", () => { \r",
+											"    pm.expect(pm.response.json().reps).to.eql(12);\r",
+											"    pm.expect(pm.response.json().weight).to.eql(55) \r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{user_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"reps\": 12, \"weight\": 55}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/workouts/{{active_workout_id}}/exercises/{{workout_exercise_id}}/sets/{{set_id}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"workouts",
+										"{{active_workout_id}}",
+										"exercises",
+										"{{workout_exercise_id}}",
+										"sets",
+										"{{set_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Cambiar notas del workout",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Estado 200 OK\", () => { pm.response.to.have.status(200); });\r",
+											"pm.test(\"Dato cambiado correctamente\", () => { \r",
+											"    pm.expect(pm.response.json().message).to.eql(\"Workout notes updated successfully\"); \r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{user_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"notes\": \"Actualizadisimo las notas, excelente trabajo\"}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/workouts/{{active_workout_id}}/notes",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"workouts",
+										"{{active_workout_id}}",
+										"notes"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Actualizar notas del ejercicio",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Estado 200 OK\", () => { pm.response.to.have.status(200); });\r",
+											"pm.test(\"Notas del ejercicio cambiadas\", () => { \r",
+											"    pm.expect(pm.response.json().notes).to.eql(\"Notas del ejercicio actualizadas\"); \r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{user_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"notes\": \"Notas del ejercicio actualizadas\"}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/workouts/{{active_workout_id}}/exercises/{{workout_exercise_id}}/notes",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"workouts",
+										"{{active_workout_id}}",
+										"exercises",
+										"{{workout_exercise_id}}",
+										"notes"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Verificar progresion",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Estado 200 OK\", () => { pm.response.to.have.status(200); });\r",
+											"pm.test(\"Verificada progresión\", () => { \r",
+											"    pm.expect(pm.response.json()).to.have.property(\"exercise_id\");\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{user_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"notes\": \"Actualizadisimo las notas, excelente trabajo\"}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/workouts/{{active_workout_id}}/progression/{{new_exercise_id}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"workouts",
+										"{{active_workout_id}}",
+										"progression",
+										"{{new_exercise_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Eliminar set",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Estado 200 OK\", () => { pm.response.to.have.status(200); });\r",
+											"pm.test(\"Eliminado correctamente el set\", () => { \r",
+											"    pm.expect(pm.response.json().message).to.equal(\"Exercise set deleted successfully\");\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{user_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/workouts/{{active_workout_id}}/exercises/{{workout_exercise_id}}/sets/{{set_id}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"workouts",
+										"{{active_workout_id}}",
+										"exercises",
+										"{{workout_exercise_id}}",
+										"sets",
+										"{{set_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Completa workout",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Se completa el workout\", () => { \r",
+											"    pm.expect(pm.response.json().message).to.equal(\"Workout completed successfully\");\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{user_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"status\": \"completed\",\r\n  \"completed_at\": {{$timestamp}}\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/workouts/{{active_workout_id}}/complete",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"workouts",
+										"{{active_workout_id}}",
+										"complete"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Historial workout",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Estado 200 OK\", () => { pm.response.to.have.status(200); });\r",
+											"\r",
+											"// Cargar AJV\r",
+											"const Ajv = require('ajv');\r",
+											"const ajv = new Ajv({ allErrors: true, strict: false });\r",
+											"\r",
+											"// Esquema que debe cumplir cada ejercicio\r",
+											"const historialScheme = {\r",
+											"  type: \"object\",\r",
+											"  properties: {\r",
+											"    id: { type: \"number\" },\r",
+											"    name: { type: [\"string\",\"null\"] },\r",
+											"    notes: { type: [\"string\",\"null\"] },\r",
+											"    template_id: { type: [\"number\",\"null\"] },\r",
+											"    user_id: { type: \"number\" },\r",
+											"    started_at: { type: [\"string\", \"null\"] },\r",
+											"    completed_at: { type: [\"string\", \"null\"] },\r",
+											"    workout_exercises: { type : \"array\"}\r",
+											"  },\r",
+											"  required: [\"id\",\"user_id\"], //Campos obligatorios\r",
+											"  additionalProperties: true \r",
+											"};\r",
+											"\r",
+											"const historialArraySchema = {type: \"array\",items: historialScheme};\r",
+											"const validate = ajv.compile(historialArraySchema);\r",
+											"\r",
+											"let data;\r",
+											"data = pm.response.json();\r",
+											"\r",
+											"// Valida el esquema\r",
+											"pm.test(\"La respuesta son los esquemas validos\", function () {\r",
+											"  const valid = validate(data);\r",
+											"  if (!valid) {\r",
+											"    console.log('AJV errors:', validate.errors);\r",
+											"  }\r",
+											"  pm.expect(valid, \"Schema validation failed\").to.be.true;\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{user_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/workouts/history",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"workouts",
+										"history"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Crear workout para prueba",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Estado 200 OK\", () => { pm.response.to.have.status(200); });\r",
+											"pm.test(\"Guarda active_workout_id\", () => {\r",
+											"    pm.environment.set(\"active_workout_id\", pm.response.json().id),\r",
+											"    pm.expect(pm.response.json().name).to.eql(\"Rutina de pechito\");\r",
+											"    pm.expect(pm.response.json().notes).to.eql(\"Pa quedar listo\");\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{user_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"name\": \"Rutina de pechito\", \"notes\": \"Pa quedar listo\"}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/workouts/templates/{{public_template_id}}/create-workout",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"workouts",
+										"templates",
+										"{{public_template_id}}",
+										"create-workout"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Eliminar workout",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Estado 200 OK\", () => { pm.response.to.have.status(200); });\r",
+											"pm.test(\"Eliminado correctamente el workout\", () => {\r",
+											"    pm.expect(pm.response.json().message).to.equal(\"Workout cancelled and removed successfully\"); \r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{user_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/workouts/{{active_workout_id}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"workouts",
+										"{{active_workout_id}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Exercises",
+			"item": [
+				{
+					"name": "Positivo",
+					"item": [
+						{
+							"name": "Get array",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Estado 200 OK\", () => { pm.response.to.have.status(200); });",
+											"",
+											"// Cargar AJV",
+											"const Ajv = require('ajv');",
+											"const ajv = new Ajv({ allErrors: true, strict: false });",
+											"",
+											"// Esquema que debe cumplir cada ejercicio",
+											"const exerciseSchema = {",
+											"  type: \"object\",",
+											"  properties: {",
+											"    id: { type: \"number\" },",
+											"    name: { type: \"string\" },",
+											"    description: { type: [\"string\", \"null\"] },",
+											"    exercise_type: { type: \"string\", enum: [\"WEIGHT_BASED\", \"TIME_BASED\"] },",
+											"    muscle_group: { type: [\"string\", \"null\"] },",
+											"    equipment: { type: [\"string\", \"null\"] },",
+											"    instructions: { type: [\"string\", \"null\"] },",
+											"    is_active: { type: [\"boolean\", \"null\"] },",
+											"    created_at: { type: [\"string\", \"null\"] },",
+											"    updated_at: { type: [\"string\", \"null\"] }",
+											"  },",
+											"  required: [\"id\", \"name\", \"exercise_type\"], //Campos obligatorios",
+											"  additionalProperties: true ",
+											"};",
+											"",
+											"const exercisesArraySchema = {type: \"array\",items: exerciseSchema};",
+											"const validate = ajv.compile(exercisesArraySchema);",
+											"",
+											"let data;",
+											"data = pm.response.json();",
+											"",
+											"// Valida el esquema",
+											"pm.test(\"La respuesta es un esquema valido\", function () {",
+											"  const valid = validate(data);",
+											"  if (!valid) {",
+											"    console.log('AJV errors:', validate.errors);",
+											"  }",
+											"  pm.expect(valid, \"Schema validation failed\").to.be.true;",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{user_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{user_token}}"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/exercises",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"exercises"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Nuevo ejercicio",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Estado 200 OK\", () => { pm.response.to.have.status(200); });\r",
+											"pm.test(\"Guarda new_exercise_id\", () => {\r",
+											"    pm.environment.set(\"new_exercise_id\", pm.response.json().id);\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{admin_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"name\": \"Press de Banca\", \"description\": \"Pecho\", \"exercise_type\": \"WEIGHT_BASED\"}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/exercises",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"exercises"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Get ejercicio",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 200 OK\", () => { pm.response.to.have.status(200); });\r",
+											"pm.test(\"ID es el correcto\", () => {\r",
+											"    pm.expect(pm.response.json().id).to.equal(pm.environment.get(\"new_exercise_id\"));\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{user_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/exercises/{{new_exercise_id}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"exercises",
+										"{{new_exercise_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Modificar ejercicio",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Estado 200 OK\", () => { pm.response.to.have.status(200); });\r",
+											"pm.test(\"Nombre se actualizó\", () => {\r",
+											"    pm.expect(pm.response.json().name).to.equal(\"Doble mortal hacia atras\");\r",
+											"    pm.expect(pm.response.json().description).to.equal(\"Texto hiperlargo de prueba nomas aaaaa\");\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{admin_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\"name\": \"Doble mortal hacia atras\", \"description\": \"Texto hiperlargo de prueba nomas aaaaa\"}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/exercises/{{new_exercise_id}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"exercises",
+										"{{new_exercise_id}}"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Elimina ejercicio",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Estado 200 OK\", () => { pm.response.to.have.status(200); });\r",
+											"pm.test(\"Ejercicio borrado\", () => {\r",
+											"    pm.expect(pm.response.json().message).to.equal(\"Exercise deleted successfully\");\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{admin_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/exercises/{{new_exercise_id}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"exercises",
+										"{{new_exercise_id}}"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Health",
+			"item": [
+				{
+					"name": "Get /Health",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"200 OK\", () => { pm.response.to.have.status(200); });\r",
+									"pm.test(\"Body is {status: 'ok'}\", () => {\r",
+									"    pm.response.to.have.jsonBody(\"status\", \"ok\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/health",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"health"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Elimina user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Estado 200 OK\", () => { pm.response.to.have.status(200); });\r",
+									"pm.test(\"Usuario borrado\", () => {\r",
+									"    pm.expect(pm.response.json().message).to.equal(\"User and all associated data deleted successfully\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{admin_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/users/{{test_user_id}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"users",
+								"{{test_user_id}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

@@ -1,0 +1,209 @@
+{
+	"info": {
+		"_postman_id": "edd48347-0c03-45e4-bc0c-4ef40842b6cd",
+		"name": "Endpoints limite",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "49628594",
+		"_collection_link": "https://fcifuentes2023-4001994.postman.co/workspace/G10's-Workspace~cd2b9dca-af9d-4cd5-8e11-d8048f3dbdcc/collection/49628549-edd48347-0c03-45e4-bc0c-4ef40842b6cd?action=share&source=collection_link&creator=49628594"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Límite",
+					"item": [
+						{
+							"name": "/login missing username",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Devuelve 422\", function () { pm.response.to.have.status(422); });",
+											"",
+											"pm.test(\"Menciona que falta la contraseña\", function () {",
+											"  const json = pm.response.json();",
+											"  const detail = json && json.detail;",
+											"  let text = \"\";",
+											"  if (Array.isArray(detail)) {",
+											"    text = detail.map(d => (typeof d === 'string' ? d : JSON.stringify(d))).join(\" \");",
+											"  } else if (typeof detail === 'object' && detail !== null) {",
+											"    text = JSON.stringify(detail);",
+											"  } else if (typeof detail === 'string') {",
+											"    text = detail;",
+											"  }",
+											"  pm.expect(text.toLowerCase()).to.include(\"username\");",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/x-www-form-urlencoded"
+									}
+								],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "password",
+											"value": "{{user_password}}",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/auth/login",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"login"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "/login missing password",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Devuelve 422\", function () { pm.response.to.have.status(422); });",
+											"",
+											"pm.test(\"Menciona que falta la contraseña\", function () {",
+											"  const json = pm.response.json();",
+											"  const detail = json && json.detail;",
+											"  let text = \"\";",
+											"  if (Array.isArray(detail)) {",
+											"    text = detail.map(d => (typeof d === 'string' ? d : JSON.stringify(d))).join(\" \");",
+											"  } else if (typeof detail === 'object' && detail !== null) {",
+											"    text = JSON.stringify(detail);",
+											"  } else if (typeof detail === 'string') {",
+											"    text = detail;",
+											"  }",
+											"  pm.expect(text.toLowerCase()).to.include(\"password\");",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/x-www-form-urlencoded"
+									}
+								],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "username",
+											"value": "{{user_email}}",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/auth/login",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"auth",
+										"login"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Límite",
+					"item": [
+						{
+							"name": "registrarse password muy corta",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test(\"Status code is 422 for short password\", function () {\r",
+											"    pm.response.to.have.status(422);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"Response body contains password validation error message\", function () {\r",
+											"    const response = pm.response.json();\r",
+											"    // Busca un mensaje que indique que la contraseña es demasiado corta\r",
+											"    pm.expect(response.detail).to.be.an('array').that.is.not.empty;\r",
+											"    pm.expect(JSON.stringify(response.detail)).to.include(\"string too short\"); \r",
+											"    // O un mensaje similar, dependiendo de la implementación\r",
+											"});"
+										],
+										"type": "text/javascript",
+										"packages": {},
+										"requests": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"email\": \"limite.pass.test@example.com\",\r\n  \"username\": \"limit_user_1234\",\r\n  \"full_name\": \"Test User Short Pass\",\r\n  \"is_active\": true,\r\n  \"is_admin\": false,\r\n  \"password\": \"a\"  // <-- Contraseña demasiado corta\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/users/register",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"users",
+										"register"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		}
+	]
+}

@@ -1,0 +1,23 @@
+[tool.pylint.main]
+py-version = "3.10"
+ignore = ["migrations", "venv", "node_modules", "frontend", "__pycache__"]
+load-plugins = []
+
+[tool.pylint.messages_control]
+disable = [
+    "C0114",  # Missing module docstring
+    "C0115",  # Missing class docstring
+    "C0116",  # Missing function docstring
+]
+
+[tool.pylint.format]
+max-line-length = 88
+
+[tool.bandit]
+skips = ["B101"]  # Ejemplo: ignorar warnings triviales (assert usado)
+exclude = ["tests", "venv", "node_modules", "frontend"]
+
+[tool.radon]
+exclude = ["venv", "migrations", "node_modules", "frontend"]
+cc_min = "B"  # Nivel mínimo de complejidad aceptable
+mi_min = "B"  # Nivel mínimo de mantenibilidad
